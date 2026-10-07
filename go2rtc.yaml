@@ -1,0 +1,11 @@
+api:
+  listen: ":1984"
+rtsp:
+  listen: ":8554"
+webrtc:
+  listen: ":8555"
+streams:
+  xiaomi_ptz:
+    - xiaomi://__XIAOMI_UID__:__REDACTED__@192.168.1.100?did=__REDACTED__&model=chuangmi.camera.039a01
+xiaomi:
+  "__XIAOMI_UID__": V1:__REDACTED__

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.user.logclean</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/python3</string>
+        <string>/Users/mac/project/frigate/log_maintenance.py</string>
+        <string>--run</string>
+    </array>
+    <key>WorkingDirectory</key>
+    <string>/Users/mac/project/frigate</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>LOG_DIR</key>
+        <string>/Users/mac/project/frigate/logs</string>
+        <key>LOG_RETENTION_DAYS</key>
+        <string>7</string>
+        <key>LOG_ROTATE_BYTES</key>
+        <string>2000000</string>
+        <key>PATH</key>
+        <string>/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin</string>
+    </dict>
+    <!-- 每小时打扫一次：滚动 logs/ 下的固定名日志，删除超过 7 天的日志与归档。
+         桥接器自己也会每小时清理，这里是兜底（桥挂了也照常打扫）。 -->
+    <key>StartInterval</key>
+    <integer>3600</integer>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/Users/mac/project/frigate/logs/log_maintenance.console.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/mac/project/frigate/logs/log_maintenance.console.err</string>
+</dict>
+</plist>

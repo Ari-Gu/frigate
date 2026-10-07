@@ -1,0 +1,75 @@
+version: 0.17-0
+
+# ===== Phase 3: GenAI 跌倒检测 =====
+# OpenAI 兼容端点：agnes-ai（ENV 里的 AGNES_KEY，2026-09-17 实测可用）。
+# 选模型依据（实测 4 场景：躺卧/站立/坐姿/空房间，判定全对）：
+#   agnes-3.0-flash  主选：非推理，输出 ~20 token，2~12s（中位 8s），图 220 image_tokens
+#   agnes-2.5-flash  备选：推理模型，5~7s 更稳定、空场景不幻觉，但 token 开销约 3 倍
+#   agnes-2.5-pro / -pro-beta / -pro-alpha  账户余额 $0，403 insufficient_user_quota，勿配
+#   agnes-2.0-flash  免费额度限流严（429），且同为推理模型，不作主力
+genai:
+  provider: openai
+  base_url: https://apihub.agnes-ai.com/v1
+  api_key: sk-__REDACTED__
+  model: agnes-3.0-flash
+
+mqtt:
+  enabled: false
+
+detectors:
+  cpu_detector:
+    type: cpu
+    num_threads: 4   # Intel Mac 物理核心数，可改
+
+objects:
+  track:
+    - person
+    - dog
+    - cat
+  genai:
+    enabled: true
+    object_prompts:
+      person: >-
+        These are sequential security camera frames showing a tracked person.
+        Determine the person's posture and status.
+        If the person is lying on the ground, has fallen down, collapsed,
+        is on the floor unexpectedly, or appears unconscious/on the ground,
+        start your response with "FALLEN: yes" followed by one short sentence
+        describing their position. Otherwise start with "FALLEN: no" and a
+        brief description of what they are doing (standing, walking, sitting
+        on furniture, etc). Be concise. Do not describe the background.
+
+snapshots:
+  enabled: true          # 供视觉模型通道取事件截图（/api/events/{id}/snapshot.jpg）
+  retain:
+    default: 7
+
+record:
+  enabled: true
+  detections:
+    retain:
+      days: 7
+      mode: motion
+  alerts:
+    retain:
+      days: 7
+      mode: motion
+
+cameras:
+  xiaomi_ptz_2k:
+    enabled: true
+    ffmpeg:
+      # go2rtc 原生跑在 Mac 宿主机（Docker VM NAT 会阻断小米 P2P 的 UDP 回包）。
+      # 2026-09-18：改用 host.docker.internal（Docker Desktop 提供的宿主机别名）。
+      # 宿主机走 DHCP，IP 曾从 .109 漂到 .106 再漂回，写死 IP 必然复发。
+      # 已验证容器内 host.docker.internal:1984 可达，故长期解绑 IP。
+      inputs:
+        - path: rtsp://host.docker.internal:8554/xiaomi_ptz
+          roles:
+            - detect
+            - record
+    detect:
+      enabled: true
+      width: 1920
+      height: 1080
+      fps: 5

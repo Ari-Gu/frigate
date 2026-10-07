@@ -1,0 +1,12 @@
+# 注意：本文件仅作记录用，frigate 实际加载的是 config/config.yaml。
+# 保持两者一致，避免混淆。
+#
+# 2026-09-17 更新：aihubmix 在本机不可达（DNS 污染 + TLS RST），NVIDIA key 全部 403，
+# 改用 agnes-ai（ENV 里的 AGNES_KEY），实测模型 agnes-3.0-flash 可用。
+genai:
+  provider: openai
+  base_url: https://apihub.agnes-ai.com/v1
+  api_key: sk-__REDACTED__
+  # 主选 agnes-3.0-flash（非推理、快）；备选 agnes-2.5-flash（推理型，更准但慢/贵）
+  # pro 系列余额 $0 不可用；2.0-flash 免费限流严
+  model: agnes-3.0-flash

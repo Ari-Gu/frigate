@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.user.keepawake</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/caffeinate</string>
+        <string>-i</string>
+        <string>-s</string>
+    </array>
+    <!-- 2026-09-23 事故根因：AC 下空闲 10 分钟即休眠（pmset sleep=10），
+         22:36:22 睡到 22:48:55（12 分 33 秒），期间 frigate / go2rtc / 跌倒告警桥
+         全部被系统挂起，摄像头 P2P 通道断开且醒来后没能自行恢复 —— 跌倒检测静默失效。
+         监控主机必须常醒：这里用 caffeinate 常驻禁止空闲休眠
+         （-i = 阻止空闲系统睡眠，-s = 阻止 AC 供电下的系统睡眠）。
+         想临时允许休眠：launchctl bootout gui/$(id -u)/com.user.keepawake -->
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/Users/mac/project/frigate/logs/keepawake.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/mac/project/frigate/logs/keepawake.err</string>
+</dict>
+</plist>

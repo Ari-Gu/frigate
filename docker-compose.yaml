@@ -1,0 +1,27 @@
+services:
+  # 注意：go2rtc 现已改为在 Mac 宿主机原生运行（见 go2rtc_native/ 与 start_go2rtc.sh），
+  # 不再以 Docker 容器方式运行。原因：Docker Desktop for Mac 的 VM NAT 会阻断小米摄像头
+  # CS2 P2P 的 UDP 回包，导致流始终超时。原生运行让 go2rtc 与摄像头处于同一局域网
+  # (192.168.1.x)，P2P 直连成功。frigate 通过 http://192.168.1.100:8554 拉流。
+  frigate:
+    container_name: frigate
+    image: ghcr.io/blakeblackshear/frigate:stable
+    restart: unless-stopped
+    privileged: true
+    shm_size: "500m"             # 摄像头多可酌情调大
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./config:/config
+      - ./frigate_record:/media/frigate
+      - type: tmpfs
+        target: /tmp/cache
+        tmpfs:
+          size: 512000000       # ~500MB
+    ports:
+      - "5001:5000"    # ← Mac 5000 被占用，映射为 5001
+    environment:
+      - TZ=Asia/Shanghai
+      - FRIGATE_RTSP_PASSWORD=xiaomi123   # 改成你自己的
+      # GenAI 兼容端点：agnes-ai（aihubmix 在本机不可达；Key 见 ENV 文件 AGNES_KEY）
+      - OPENAI_BASE_URL=https://apihub.agnes-ai.com/v1
+      - OPENAI_API_KEY=sk-__REDACTED__

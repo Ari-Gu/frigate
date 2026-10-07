@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.user.fallalert</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/python3</string>
+        <string>-u</string>
+        <string>/Users/mac/project/frigate/fall_alert_bridge.py</string>
+    </array>
+    <key>WorkingDirectory</key>
+    <string>/Users/mac/project/frigate</string>
+    <!-- 本机 frigate / go2rtc 请求不能走代理，否则会被本地代理拦截（502） -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <!-- 2026-10-02：可调参数（视觉开关/频率/阈值/敏感度等）已集中到项目根的
+             .ENV 文件统一管理（`python3 fall_alert_bridge.py --env-check` 可核对生效值）。
+             因为环境变量优先级高于 .ENV，此处**只保留基础设施变量**：
+             与 .ENV 重复声明的键会把新配置盖住，已移除 VISION_ENABLED / VISION_EVERY。 -->
+        <key>NO_PROXY</key>
+        <string>127.0.0.1,localhost</string>
+        <key>no_proxy</key>
+        <string>127.0.0.1,localhost</string>
+        <key>PATH</key>
+        <string>/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin</string>
+        <!-- 2026-09-30：日志改为进程自己按天写 logs/fall_alert_bridge-YYYY-MM-DD.log，
+             保留 7 天。此处为双保险：同时镜像 stdout，由 launchd 落到 console.log，
+             万一进程内写盘出问题，仍有完整备份可查（两者都受 7 天清理保护）。 -->
+        <key>LOG_DIR</key>
+        <string>/Users/mac/project/frigate/logs</string>
+        <key>LOG_RETENTION_DAYS</key>
+        <string>7</string>
+        <key>LOG_MIRROR_STDOUT</key>
+        <string>1</string>
+    </dict>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <!-- 2026-09-30：日志统一收进 logs/；真正的按天日志由进程自己写，
+         这两个文件只是"进程内日志失效时"的兜底捕获（含启动期崩溃的 traceback）。 -->
+    <key>StandardOutPath</key>
+    <string>/Users/mac/project/frigate/logs/fall_alert_bridge.console.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/mac/project/frigate/logs/fall_alert_bridge.console.err</string>
+</dict>
+</plist>

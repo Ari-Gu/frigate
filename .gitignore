@@ -1,0 +1,43 @@
+# ---- 密钥与本机配置（绝不入库）----
+.ENV
+ENV
+feishu_app.conf
+*.key
+*.pem
+*.token
+config/.jwt_secret
+
+# ---- 运行产物 ----
+logs/
+*.log
+*.log.archived*
+*.log.phase2*
+fall_geo_samples.csv
+
+# ---- 录像与媒体 ----
+frigate_record/
+config/frigate.db
+config/frigate.db-wal
+config/frigate.db-shm
+config/backup.db
+config/.timeline
+config/.search_stats.json
+config/.vacuum
+config/.exports
+*.mp4
+*.ts
+*.jpg
+*.png
+
+# ---- 备份与临时文件 ----
+*.bak*
+*.bak2*
+*.bak3*
+*.tar
+.DS_Store
+__pycache__/
+*.pyc
+
+# ---- 本机原生依赖 ----
+go2rtc_native/
+.workbuddy/

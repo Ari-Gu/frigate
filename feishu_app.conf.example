@@ -1,0 +1,32 @@
+# 飞书发图凭证（跌倒告警里带现场截图）
+#
+# 为什么需要它：飞书**自定义机器人 webhook 不能直接发图片** —— 它只认 image_key，
+# 而 image_key 必须由"具备机器人能力的应用"调 im/v1/images 上传得到。
+# 配好这个文件后，告警会自动变成「中文文字卡片 + 现场截图」两条消息。
+#
+# 获取步骤（5 分钟，飞书开放平台 https://open.feishu.cn/app）：
+#   1. 创建企业自建应用（名称随意，如 fall-alert）
+#   2. 「添加应用能力」→ 开启「机器人」
+#      ⚠️ 不开会报 `code=234007 App does not enable bot feature`。开完也要重新发布版本。
+#   3. 「权限管理」→ 搜索并添加权限：**获取与上传图片或文件资源**（scope 名 `im:resource`，
+#      上传接口实际要求的是 `im:resource:upload`，两个都勾上最省事）
+#   4. 「凭证与基础信息」→ 复制 App ID 和 App Secret，填到下面
+#   5. ⚠️ 加完权限要**创建版本并发布**（或让管理员审批通过），否则权限不生效 ——
+#      表现为能换到 token、但上传图片报：
+#      `code=99991672 Access denied. One of the following scopes is required: [im:resource:upload, im:resource]`
+#      该报错里会直接给出「点击申请」链接，照点即可。
+#
+# 用法：
+#   cp feishu_app.conf.example feishu_app.conf
+#   chmod 600 feishu_app.conf          # 里面是凭据，别让别的用户读到
+#   （填写下面两行）
+#   然后重启告警桥：launchctl kickstart -k gui/$(id -u)/com.user.fallalert
+#   验证：NO_PROXY=127.0.0.1,localhost /usr/bin/python3 fall_alert_bridge.py --test-image
+#
+# 注意：环境变量 FEISHU_APP_ID / FEISHU_APP_SECRET 优先级高于本文件。
+# 本文件不要提交到 git / 不要贴到聊天群里。
+# 另：本项目根目录的 ENV 文件用的是 `AppID:` / `App Secret:` 冒号格式，桥**读不了**，
+#     必须转成下面的 KEY=VALUE 才能生效。
+
+FEISHU_APP_ID=cli_xxxxxxxxxxxxxxxx
+FEISHU_APP_SECRET=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
